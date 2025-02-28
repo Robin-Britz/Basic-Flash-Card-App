@@ -1,6 +1,7 @@
 import tkinter
-from lib2to3.pgen2.pgen import PgenGrammar
+import random
 from tkinter import PhotoImage
+
 
 BACKGROUND_COLOR = "#B1DDC6"
 
@@ -9,21 +10,46 @@ root = tkinter.Tk()
 root.title("Flash Card App")
 root.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
 
+dict_list = {}
+word_list = []
+
+with open("data/french_words.csv", "r") as data:
+    for key in data:
+        word = key.split(",")
+        dict_list[word[0]] = word[1]
+
+for key in dict_list:
+    word_list.append(key)
+
+title = "French"
+word = "English"
+
+
+def random_word():
+    title = random.choice(word_list)
+    word = dict_list[title]
+    card_front.delete("title")
+    card_front.delete("word")
+    card_front.create_text(400, 150, text=f"{title}", font=("Arial", 40, "italic"), tags="title")
+    card_front.create_text(400, 263, text=f"{word}", font=("Arial", 40, "bold"), tags="word")
+    card_front.grid(row=0, column=0, columnspan=2)
+
+
 # WIDGETS INSIDE CANVAS
 card_front_img = PhotoImage(file="./images/card_front.png")
 card_front = tkinter.Canvas(root, width=800, height=526, highlightthickness=0, bg=BACKGROUND_COLOR)
 card_front.create_image(400, 263, image=card_front_img)
-card_front.create_text(400, 150, text="Title", font=("Arial", 40, "italic"))
-card_front.create_text(400, 263, text="Word", font=("Arial", 40, "bold"))
+card_front.create_text(400, 150, text=f"{title}", font=("Arial", 40, "italic"), tags="title")
+card_front.create_text(400, 263, text=f"{word}", font=("Arial", 40, "bold"), tags="word")
 card_front.grid(row=0, column=0, columnspan=2)
 
 # BUTTONS
 incorrect_btn_img = PhotoImage(file="./images/wrong.png")
-correct_btn_img = PhotoImage(file="./images/right.png")
-incorrect_btn = tkinter.Button(root, borderwidth=0, highlightthickness=0, image=incorrect_btn_img)
+incorrect_btn = tkinter.Button(root, borderwidth=0, highlightthickness=0, image=incorrect_btn_img, command=random_word)
 incorrect_btn.grid(row=1, column=0)
 
-correct_btn = tkinter.Button(root, borderwidth=0, highlightthickness=0, image=correct_btn_img)
+correct_btn_img = PhotoImage(file="./images/right.png")
+correct_btn = tkinter.Button(root, borderwidth=0, highlightthickness=0, image=correct_btn_img, command=random_word)
 correct_btn.grid(row=1, column=1)
 
 root.mainloop()
