@@ -2,16 +2,16 @@ import tkinter
 import random
 from tkinter import PhotoImage
 
-
 BACKGROUND_COLOR = "#B1DDC6"
+FONT = ("Calibri", 40, "normal")
+SCORE = 0
+dict_list = {}
+word_list = []
 
 # MAIN WINDOW
 root = tkinter.Tk()
 root.title("Flash Card App")
 root.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
-
-dict_list = {}
-word_list = []
 
 with open("data/french_words.csv", "r") as data:
     for key in data:
@@ -21,32 +21,45 @@ with open("data/french_words.csv", "r") as data:
 for key in dict_list:
     word_list.append(key)
 
-title = "French"
-word = "English"
-
 
 def incorrect():
-    title = card_front.itemcget("title", "text")
-    word = dict_list[title]
-    card_front.delete("title")
-    card_front.delete("word")
-    card_front.create_text(400, 150, text=f"{title}", font=("Arial", 40, "italic"), tags="title")
-    card_front.create_text(400, 263, text=f"{word}", font=("Arial", 40, "bold"), tags="word")
+    title = new_card()
+    reveal_answer(title)
 
 
 def correct():
+    title = new_card()
+    reveal_answer(title)
+
+
+def new_card():
     title = random.choice(word_list)
     card_front.delete("title")
     card_front.delete("word")
-    card_front.create_text(400, 150, text=f"{title}", font=("Arial", 40, "italic"), tags="title")
+    card_front.create_text(400, 150, text=f"{title}", font=FONT, tags="title")
+    return title
+
+
+def reveal_answer(title):
+    global word
+    word = dict_list[title]
+    card_front.after(2000, card_front_create_word)
+
+
+def card_front_create_word():
+    card_front.create_text(400, 263, text=f"{word}", font=FONT, tags="word")
 
 
 # WIDGETS INSIDE CANVAS
 card_front_img = PhotoImage(file="./images/card_front.png")
 card_front = tkinter.Canvas(root, width=800, height=526, highlightthickness=0, bg=BACKGROUND_COLOR)
 card_front.create_image(400, 263, image=card_front_img)
-card_front.create_text(400, 150, text=f"{title}", font=("Arial", 40, "italic"), tags="title")
-card_front.create_text(400, 263, text=f"{word}", font=("Arial", 40, "bold"), tags="word")
+
+# DEFAULT TITLE AND WORD
+title = "French"
+word = "English"
+card_front.create_text(400, 150, text=f"{title}", font=FONT, tags="title")
+card_front.create_text(400, 263, text=f"{word}", font=FONT, tags="word")
 card_front.grid(row=0, column=0, columnspan=2)
 
 # BUTTONS
